@@ -1,8 +1,9 @@
 class RecipeCard extends HTMLElement {
   constructor() {
     // Part 1 Expose - TODO
-
+    super()
     // You'll want to attach the shadow DOM here
+    this.attachShadow({mode: 'open'})
   }
 
   set data(data) {
@@ -100,6 +101,61 @@ class RecipeCard extends HTMLElement {
     // created in the constructor()
 
     // Part 1 Expose - TODO
+    this.shadowRoot.appendChild(styleElem)
+    this.shadowRoot.appendChild(card)
+
+    var thumbnail = document.createElement('img')
+    thumbnail.src = searchForKey(data, 'thumbnailUrl')
+    thumbnail.alt = 'Recipe Title'
+
+    var title = document.createElement('p')
+    title.classList.add('title')
+    var href = document.createElement('a')
+    href.href = getUrl(data)
+    href.textContent = searchForKey(data, 'headline')
+    title.appendChild(href)
+
+    var organization = document.createElement('p')
+    organization.classList.add('organization')
+    organization.textContent = getOrganization(data)
+
+    var time = document.createElement('time')
+    time.textContent = convertTime(searchForKey(data, 'totalTime'))
+
+    var ingredients = document.createElement('p')
+    ingredients.classList.add('ingredients')
+    ingredients.textContent = createIngredientList(searchForKey(data, 'recipeIngredient'))
+
+    var rating = document.createElement('div')
+    rating.classList.add('rating')
+    var rating_value = searchForKey(data, 'ratingValue')
+    if(rating_value != undefined) {
+      var rating_span = document.createElement('span')
+      rating_span.textContent = rating_value
+
+      var rating_img = document.createElement('img')
+      rating_img.src = 'assets/images/icons/' + String(Math.round(rating_value)) + '-star.svg'
+      rating_img.alt = String(Math.round(rating_value)) + 'stars'
+
+      var total_span = document.createElement('span')
+      total_span.textContent = '(' + String(searchForKey(data, 'ratingCount')) + ')'
+
+      rating.appendChild(rating_span)
+      rating.appendChild(rating_img)
+      rating.appendChild(total_span)
+    } else {
+      var span = document.createElement('span')
+      span.textContent = 'No Reviews'
+
+      rating.appendChild(span)
+    }
+    
+    card.appendChild(thumbnail)
+    card.appendChild(title)
+    card.appendChild(organization)
+    card.appendChild(rating)
+    card.appendChild(time)
+    card.appendChild(ingredients)
   }
 }
 

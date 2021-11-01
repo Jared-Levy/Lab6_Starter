@@ -5,7 +5,10 @@
 const recipes = [
   'https://introweb.tech/assets/json/ghostCookies.json',
   'https://introweb.tech/assets/json/birthdayCake.json',
-  'https://introweb.tech/assets/json/chocolateChip.json'
+  'https://introweb.tech/assets/json/chocolateChip.json',
+  'assets/recipes/recipes_1.json',
+  'assets/recipes/recipes_2.json',
+  'assets/recipes/recipes_3.json'
 ];
 
 // Once all of the recipes that were specified above have been fetched, their
@@ -43,6 +46,24 @@ async function fetchRecipes() {
     // in the recipes folder and fetch them from there. You'll need to add their paths to the recipes array.
 
     // Part 1 Expose - TODO
+    var fetched = 0
+    for(const recipe of recipes) {
+      fetch(recipe)
+        .then(response => {
+          return response.json()
+        })
+        .then(data => {
+          fetched = fetched + 1
+          recipeData[recipe] = data
+          if(fetched == recipes.length) {
+            resolve(true)
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          reject(false)
+        })
+    }
   });
 }
 
@@ -54,6 +75,19 @@ function createRecipeCards() {
   // show any others you've added when the user clicks on the "Show more" button.
 
   // Part 1 Expose - TODO
+  // We only want to show 3 recipes
+  var recipe_counter = 0
+  for(const recipe of recipes) {
+    var loc = document.querySelector('main')
+    var recipe_card = document.createElement('recipe-card')
+    recipe_card.data = recipeData[recipe]
+    loc.appendChild(recipe_card)
+
+    recipe_counter = recipe_counter + 1
+    if(recipe_counter == 3) {
+      break
+    }
+  }
 }
 
 function bindShowMore() {
@@ -65,4 +99,35 @@ function bindShowMore() {
   // in the recipeData object where you stored them/
 
   // Part 2 Explore - TODO
+  var show_more = document.querySelector('button')
+  show_more.addEventListener('click', (event) => {
+    if(show_more.textContent == 'Show more') {
+      var recipe_counter = 0
+      for(const recipe of recipes) {
+        if(recipe_counter > 2) {
+          var loc = document.querySelector('main')
+          var recipe_card = document.createElement('recipe-card')
+          recipe_card.data = recipeData[recipe]
+          loc.appendChild(recipe_card)
+        }
+    
+        recipe_counter = recipe_counter + 1
+        if(recipe_counter == 6) {
+          break
+        }
+      }
+      show_more.textContent = 'Show less'
+    } else {
+      var recipe_cards = document.querySelectorAll('recipe-card')
+      var recipe_counter = 0
+      for(const recipe of recipe_cards) {
+        if(recipe_counter > 2) {
+          recipe.remove()
+        }
+        
+        recipe_counter = recipe_counter + 1
+      }
+      show_more.textContent = 'Show more'
+    }
+  })
 }
